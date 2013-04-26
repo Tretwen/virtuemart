@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" version="0.1" group="vmpayment" method="install">
+	<name>VM Payment - mPAY24</name>
+	<author>Tretwen</author>
+	<creationDate>08-Mar-2013</creationDate>
+	<license>https://gnu.org/licenses/gpl.html GNU GPLv3</license>
+	<version>1.0</version>
+	<description><![CDATA[
+mPAY24 Payment Gateway Extension for VirtueMart<br><br>
+[DE] : Vergessen Sie bitte nicht, das Plugin zu <a href="index.php?option=com_plugins&view=plugins">veröffentlichen</a> und die Bezahlmethode im Virtuemart zu <a href="index.php?option=com_virtuemart&view=paymentmethod">erstellen und konfigurieren</a>.<br><br>
+[EN] : Please do not forget to <a href="index.php?option=com_plugins&view=plugins">publish</a> the plugin and to <a href="index.php?option=com_virtuemart&view=paymentmethod">create and configure</a> a payment method in the VirtueMart extension.
+	]]></description>
+	<languages folder="languages">
+		<language tag="en-GB" client="administrator">en-GB.plg_vmpayment_mpay24.ini</language>
+		<language tag="en-GB" client="administrator">en-GB.plg_vmpayment_mpay24.sys.ini</language>
+		<language tag="de-DE" client="administrator">de-DE.plg_vmpayment_mpay24.ini</language>
+		<language tag="de-DE" client="administrator">de-DE.plg_vmpayment_mpay24.sys.ini</language>
+	</languages>
+	<files>
+		<filename plugin="mpay24">mpay24.php</filename>
+		<filename>index.html</filename>
+		<filename>API/ShopImpl.php</filename>
+		<filename>API/MPay24Api.php</filename>
+		<filename>API/MPay24Shop.php</filename>
+		<filename>API/orderXML.php</filename>
+		<filename>API/MDXI.xsd</filename>
+		<filename>API/cacert.pem</filename>
+	</files>
+	<params addpath="/administrator/components/com_virtuemart/elements">
+		<param type="spacer" default="VMPAYMENT_MPAY24_CONF_SEC_ACCSETTINGS" />
+		<param type="radio" name="mpay24_conf_modus" default="true" label="VMPAYMENT_MPAY24_CONF_MODUS" description="VMPAYMENT_MPAY24_CONF_MODUS_DESC">
+			<option value="false">VMPAYMENT_MPAY24_CONF_MODUS_OPT_1</option>
+			<option value="true">VMPAYMENT_MPAY24_CONF_MODUS_OPT_0</option>
+		</param>
+		<param type="text" name="mpay24_conf_merchantid" size="25" label="VMPAYMENT_MPAY24_CONF_MERCHANTID" desciption="VMPAYMENT_MPAY24_CONF_MERCHANTID_DESC"/>
+		<param type="password" name="mpay24_conf_password" size="25" label="VMPAYMENT_MPAY24_CONF_PASSWORD" desciption="VMPAYMENT_MPAY24_CONF_PASSWORD_DESC"/>
+		<param type="radio" name="mpay24_conf_debug" default="true" label="VMPAYMENT_MPAY24_CONF_DEBUG" description="VMPAYMENT_MPAY24_CONF_DEBUG_DESC">
+			<option value="false">COM_VIRTUEMART_NO</option>
+			<option value="true">COM_VIRTUEMART_YES</option>
+		</param>
+		<param type="radio" name="mpay24_conf_proxy" default="false" label="VMPAYMENT_MPAY24_CONF_PROXY" description="VMPAYMENT_MPAY24_CONF_PROXY_DESC">
+			<option value="false">COM_VIRTUEMART_NO</option>
+			<option value="true">COM_VIRTUEMART_YES</option>
+		</param>
+		<param type="text" name="mpay24_conf_proxy_host" size="50" label="VMPAYMENT_MPAY24_CONF_PROXY_HOST"/>
+		<param type="text" name="mpay24_conf_proxy_port" size="50" label="VMPAYMENT_MPAY24_CONF_PROXY_PORT"/>
+		
+		<param type="spacer" default="" />
+		<param type="spacer" default="VMPAYMENT_MPAY24_CONF_SEC_MODULCONF" />
+		<param name="vm_conf_accepted_currency" type="vmacceptedcurrency" default="" label="VMPAYMENT_MPAY24_VMCONF_ACCEPTED_CURRENCY" description="VMPAYMENT_MPAY24_VMCONF_ACCEPTED_CURRENCY_DESC" />
+		<param name="vm_conf_accepted_countries" type="vmcountries" scope="com_virtuemart" default="" label="VMPAYMENT_MPAY24_VMCONF_ACCEPTED_COUNTRIES" description="VMPAYMENT_MPAY24_VMCONF_ACCEPTED_COUNTRIES_DESC" />
+    	<param name="vm_conf_min_amount" type="text" label="VMPAYMENT_MPAY24_VMCONF_MIN_AMOUNT" description="VMPAYMENT_MPAY24_VMCONF_MIN_AMOUNT_DESC" />
+    	<param name="vm_conf_max_amount" type="text" label="VMPAYMENT_MPAY24_VMCONF_MAX_AMOUNT" description="VMPAYMENT_MPAY24_VMCONF_MAX_AMOUNT_DESC" />
+		
+		<param name="mpay24_conf_status_pending" type="vmorderstate" scope="com_virtuemart" default="P" label="VMPAYMENT_MPAY24_CONF_STATUS_PENDING" description="VMPAYMENT_MPAY24_CONF_STATUS_PENDING_DESC" />
+    	<param name="mpay24_conf_status_success" type="vmorderstate" scope="com_virtuemart" default="C" label="VMPAYMENT_MPAY24_CONF_STATUS_SUCCESS" description="VMPAYMENT_MPAY24_CONF_STATUS_SUCCESS_DESC" />
+    	<param name="mpay24_conf_status_failed" type="vmorderstate" scope="com_virtuemart" default="X" label="VMPAYMENT_MPAY24_CONF_STATUS_FAILED" description="VMPAYMENT_MPAY24_CONF_STATUS_FAILED_DESC" />
+    	<param name="mpay24_conf_status_credited" type="vmorderstate" scope="com_virtuemart" default="R" label="VMPAYMENT_MPAY24_CONF_STATUS_CREDITED" description="VMPAYMENT_MPAY24_CONF_STATUS_CREDITED_DESC" />
+		
+		<param type="spacer" default="" />
+		<param type="spacer" default="VMPAYMENT_MPAY24_CONF_SEC_PAYSYSTEMS" />
+		<param type="list" name="mpay24_conf_billingaddr" default="ReadOnly" label="VMPAYMENT_MPAY24_CONF_BILLINGADDR" description="VMPAYMENT_MPAY24_CONF_BILLINGADDR_DESC">
+			<option value="ReadOnly">VMPAYMENT_MPAY24_CONF_BILLINGADDR_OPT_0</option>
+			<option value="ReadWrite">VMPAYMENT_MPAY24_CONF_BILLINGADDR_OPT_1</option>
+		</param>
+		<param type="list" name="mpay24_conf_paysystem" default="0" label="VMPAYMENT_MPAY24_CONF_PAYSYSTEM" description="VMPAYMENT_MPAY24_CONF_PAYSYSTEM_DESC">
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_OPT_0</option>
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_OPT_1</option>
+		</param>
+		
+		<param type="hidden" name="mpay24_conf_paysystem_1" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_2" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_3" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_4" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_5" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_6" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_7" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_8" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_9" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_10" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_11" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_12" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_13" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_14" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_15" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_16" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_17" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_18" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_19" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_20" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_21" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_22" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_23" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_24" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_25" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_26" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_27" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_28" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_29" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_30" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_31" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_32" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_33" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_34" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_35" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_36" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_37" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_38" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_39" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_40" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_41" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_42" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_43" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_44" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_45" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_46" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_47" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_48" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_49" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+		<param type="hidden" name="mpay24_conf_paysystem_50" default="1" >
+			<option value="1">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_1</option>
+			<option value="0">VMPAYMENT_MPAY24_CONF_PAYSYSTEM_SELECTED_OPT_0</option>
+		</param>
+	</params>
+</extension>
